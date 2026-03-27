@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge2000 | 國中英單先修戰略站 (Dark Mode)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        body { 
+            font-family: 'Noto Sans TC', sans-serif; 
+            background-color: #020617; /* Slate-950 */
+            color: #f1f5f9; 
+        }
+        .step-done { background-color: #10b981; color: white; border-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
+        
+        /* 自定義捲軸 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+
+        /* 呼吸燈動畫 */
+        .glow-red {
+            animation: glow-red 2s infinite;
+        }
+        @keyframes glow-red {
+            0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+            50% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+            100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+        }
+
+        /* Modal 動畫 */
+        .modal-enter { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Header / Progress Area (縮小版) -->
+    <header class="bg-indigo-950/90 backdrop-blur-md text-white p-3 shadow-2xl sticky top-0 z-50 border-b border-indigo-500/20">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex justify-between items-end mb-2">
+                <h1 class="text-lg font-black tracking-tight flex items-center">
+                    <span class="bg-indigo-600 p-1 rounded mr-2 text-sm"><i class="fas fa-rocket"></i></span>
+                    Bridge2000
+                </h1>
+                <div class="text-right">
+                    <p class="text-[9px] opacity-60 uppercase font-bold tracking-tighter">Mastery: 15 / 2000 (0.7%)</p>
+                </div>
+            </div>
+            <!-- 4 Layer Progress (精簡版) -->
+            <div class="grid grid-cols-4 gap-2 text-[9px] text-center font-bold">
+                <div class="space-y-1">
+                    <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-emerald-500 w-1/4"></div>
+                    </div>
+                    <span class="text-emerald-400 opacity-80">生存</span>
+                </div>
+                <div class="space-y-1">
+                    <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 w-0"></div>
+                    </div>
+                    <span class="text-slate-500">基礎</span>
+                </div>
+                <div class="space-y-1">
+                    <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-yellow-400 w-0"></div>
+                    </div>
+                    <span class="text-slate-500">進階</span>
+                </div>
+                <div class="space-y-1">
+                    <div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-red-500 w-[15%]"></div>
+                    </div>
+                    <span class="text-red-400 opacity-80">補強</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 space-y-5">
+
+        <!-- Lesson Timer & Mode (微調高度) -->
+        <div class="flex justify-between items-center bg-slate-900/40 p-3 rounded-xl border border-slate-800">
+            <div class="flex items-center space-x-3">
+                <div class="bg-orange-500/10 text-orange-500 p-1.5 rounded-lg border border-orange-500/20 text-xs">
+                    <i class="fas fa-stopwatch"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Mission Status</p>
+                    <p class="text-xs font-bold text-slate-300" id="lesson-step">新字學習 (Step 2/5)</p>
+                </div>
+            </div>
+            <div id="timer" class="text-lg font-mono font-bold text-indigo-400">25:00</div>
+        </div>
+
+        <!-- Word Interaction Area -->
+        <section class="bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-800 relative transition-all duration-500" id="main-card">
+            <div class="p-3 bg-slate-800/50 border-b border-slate-800 flex justify-between items-center">
+                <span class="text-[9px] font-bold text-slate-500 tracking-widest uppercase" id="layer-info">Layer 4: Supplement | Topic: Confusing Pairs</span>
+                <span class="text-[9px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded border border-red-500/30 font-bold hidden" id="confusing-badge">易混淆注意</span>
+            </div>
+
+            <!-- Single Word Card -->
+            <div class="p-6 md:p-10 flex flex-col items-center text-center">
+                <div class="mb-3">
+                    <span class="text-indigo-400 font-black text-[10px] uppercase tracking-[0.2em]" id="word-pos">Verb</span>
+                </div>
+                <h2 class="text-6xl md:text-7xl font-black text-white mb-2 tracking-tight" id="word-eng">borrow</h2>
+                <p class="text-xl md:text-2xl text-slate-400 mb-8 font-medium" id="word-chi">借入</p>
+                
+                <!-- 5-Step Progress Tracker -->
+                <div class="w-full max-w-md grid grid-cols-5 gap-2 md:gap-3 mb-8">
+                    <button onclick="markStep(0)" id="step-btn-0" class="step-btn border-2 border-slate-800 bg-slate-900/50 rounded-xl py-2 md:py-3 flex flex-col items-center transition-all hover:border-slate-700">
+                        <span class="text-[9px] font-black uppercase mb-1">Mean</span>
+                        <i class="fas fa-eye text-xs"></i>
+                    </button>
+                    <button onclick="markStep(1)" id="step-btn-1" class="step-btn border-2 border-slate-800 bg-slate-900/50 rounded-xl py-2 md:py-3 flex flex-col items-center transition-all hover:border-slate-700">
+                        <span class="text-[9px] font-black uppercase mb-1">Spell</span>
+                        <i class="fas fa-font text-xs"></i>
+                    </button>
+                    <button onclick="markStep(2)" id="step-btn-2" class="step-btn border-2 border-slate-800 bg-slate-900/50 rounded-xl py-2 md:py-3 flex flex-col items-center transition-all hover:border-slate-700">
+                        <span class="text-[9px] font-black uppercase mb-1">Hear</span>
+                        <i class="fas fa-volume-up text-xs"></i>
+                    </button>
+                    <button onclick="markStep(3)" id="step-btn-3" class="step-btn border-2 border-slate-800 bg-slate-900/50 rounded-xl py-2 md:py-3 flex flex-col items-center transition-all hover:border-slate-700">
+                        <span class="text-[9px] font-black uppercase mb-1">Context</span>
+                        <i class="fas fa-book-open text-xs"></i>
+                    </button>
+                    <button onclick="markStep(4)" id="step-btn-4" class="step-btn border-2 border-slate-800 bg-slate-900/50 rounded-xl py-2 md:py-3 flex flex-col items-center transition-all hover:border-slate-700">
+                        <span class="text-[9px] font-black uppercase mb-1">Output</span>
+                        <i class="fas fa-pen text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Confusing Comparison Note (Conditional) -->
+                <div id="comparison-note" class="w-full bg-red-950/20 border border-red-900/30 rounded-xl p-4 mb-6 text-left hidden glow-red">
+                    <div class="flex items-center text-red-400 font-bold text-xs mb-2">
+                        <i class="fas fa-balance-scale mr-2 text-[10px]"></i> 戰略對照：<span id="compare-word" class="ml-1 text-[10px]">lend</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed italic" id="compare-text">
+                        "borrow 是把東西借進來，lend 是把東西借出去給別人。"
+                    </p>
+                </div>
+
+                <!-- Context Sentence Area -->
+                <div class="w-full bg-slate-950 p-5 rounded-2xl border border-slate-800 mb-8 text-left relative group overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                    <button onclick="playSentenceAudio()" class="absolute right-3 top-3 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 p-2.5 rounded-full border border-indigo-500/30 transition-all active:scale-90" title="美式發音">
+                        <i class="fas fa-volume-up text-sm"></i>
+                    </button>
+                    <div class="pr-10">
+                        <p class="text-lg font-medium text-slate-200 leading-relaxed mb-1" id="word-sentence">
+                            "Can I <span class="text-indigo-400 font-bold underline decoration-indigo-500/50 underline-offset-4">borrow</span> your pen?"
+                        </p>
+                        <p class="text-xs text-slate-500 font-medium" id="word-translation">「我可以借你的筆嗎？」</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex space-x-3 w-full">
+                    <button class="flex-1 bg-slate-800 text-slate-400 py-3 rounded-xl font-bold hover:bg-slate-700 transition-colors border border-slate-700 text-sm">
+                        <i class="fas fa-backward mr-2"></i> 上一個
+                    </button>
+                    <button onclick="nextWord()" class="flex-[2] bg-indigo-600 text-white py-3 rounded-xl font-black shadow-[0_10px_20px_rgba(79,70,229,0.3)] hover:bg-indigo-500 transition-all transform active:scale-95 text-sm">
+                        完成並繼續 <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recycling Zone -->
+        <section class="space-y-3">
+            <div class="flex justify-between items-center px-1">
+                <h3 class="font-black text-[10px] text-slate-500 uppercase tracking-widest"><i class="fas fa-sync-alt text-emerald-500 mr-1.5"></i>Recycling Zone</h3>
+                <button onclick="startQuickReview()" class="text-[9px] bg-emerald-600/20 text-emerald-400 px-2 py-1 rounded-lg border border-emerald-500/30 font-bold hover:bg-emerald-600/40 transition-all">
+                    <i class="fas fa-bolt mr-1"></i> 開始複習 (隨機3字)
+                </button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-slate-900 p-3 rounded-xl border border-red-900/30 hover:border-red-500/50 transition-all cursor-pointer group">
+                    <p class="text-[8px] text-red-500 font-black mb-1">CONFUSING</p>
+                    <p class="font-bold text-slate-200 text-sm">say / tell</p>
+                    <p class="text-[10px] text-slate-500">說 / 告訴</p>
+                </div>
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 hover:border-indigo-500/50 transition-all cursor-pointer group">
+                    <p class="text-[8px] text-slate-500 font-black mb-1">D+3 REVIEW</p>
+                    <p class="font-bold text-slate-200 text-sm">careful</p>
+                    <p class="text-[10px] text-slate-500">小心的</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Quick Review Modal -->
+    <div id="review-modal" class="fixed inset-0 bg-slate-950/95 z-[60] flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 shadow-2xl modal-enter">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-indigo-400 font-black text-sm uppercase tracking-widest"><i class="fas fa-bolt mr-2"></i>快速複習模式</h3>
+                <button onclick="closeReview()" class="text-slate-500 hover:text-white p-2"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            
+            <div id="review-list" class="space-y-4 mb-8">
+                <!-- 隨機單字將在此生成 -->
+            </div>
+
+            <button onclick="startQuickReview()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg hover:bg-indigo-500 transition-all">
+                換一批複習 <i class="fas fa-sync-alt ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-950/80 backdrop-blur-lg border-t border-slate-800 p-2 flex justify-around items-center shadow-[0_-10px_20px_rgba(0,0,0,0.5)] z-50">
+        <button class="flex flex-col items-center text-indigo-400">
+            <i class="fas fa-home text-base"></i>
+            <span class="text-[8px] font-black mt-1 uppercase tracking-tighter">Home</span>
+        </button>
+        <button class="flex flex-col items-center text-slate-600">
+            <i class="fas fa-book text-base"></i>
+            <span class="text-[8px] font-black mt-1 uppercase tracking-tighter">WordList</span>
+        </button>
+        <div class="bg-indigo-600 w-12 h-12 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(79,70,229,0.5)] -mt-8 border-4 border-slate-950 group active:scale-90 transition-transform cursor-pointer">
+            <i class="fas fa-play text-lg"></i>
+        </div>
+        <button class="flex flex-col items-center text-slate-600">
+            <i class="fas fa-bolt text-base"></i>
+            <span class="text-[8px] font-black mt-1 uppercase tracking-tighter">Confusion</span>
+        </button>
+        <button class="flex flex-col items-center text-slate-600">
+            <i class="fas fa-user-circle text-base"></i>
+            <span class="text-[8px] font-black mt-1 uppercase tracking-tighter">Profile</span>
+        </button>
+    </nav>
+
+    <script>
+        const words = [
+            { 
+                eng: 'borrow', chi: '借入', pos: 'Verb', 
+                sen: 'Can I borrow your pen?', tra: '我可以借你的筆嗎？',
+                layer: 4, topic: 'Confusing Pairs',
+                confusing: true, compare: 'lend (借出)',
+                note: 'borrow 是把東西「借進來」，lend 是把東西「借出去」。'
+            },
+            { 
+                eng: 'say', chi: '說', pos: 'Verb', 
+                sen: 'What did you say?', tra: '你剛才說了什麼？',
+                layer: 4, topic: 'Confusing Pairs',
+                confusing: true, compare: 'tell (告訴)',
+                note: 'say 重點在「說話內容」，tell 重點在「告訴某人（對象）」。'
+            },
+            { 
+                eng: 'hungry', chi: '飢餓的', pos: 'Adjective', 
+                sen: 'I am hungry. Let\'s get some snacks.', tra: '我肚子餓了。我們去吃點點心吧。',
+                layer: 1, topic: 'Feelings'
+            },
+            { 
+                eng: 'careful', chi: '小心的', pos: 'Adjective', 
+                sen: 'Be careful when you cross the street.', tra: '過馬路時要小心。',
+                layer: 1, topic: 'Safety'
+            },
+            { 
+                eng: 'breakfast', chi: '早餐', pos: 'Noun', 
+                sen: 'I have breakfast at seven o\'clock.', tra: '我七點鐘吃早餐。',
+                layer: 1, topic: 'Food'
+            },
+            { 
+                eng: 'weather', chi: '天氣', pos: 'Noun', 
+                sen: 'How is the weather today?', tra: '今天天氣如何？',
+                layer: 1, topic: 'Nature'
+            }
+        ];
+
+        let currentWordIndex = 0;
+        let currentSteps = [false, false, false, false, false];
+
+        function playSentenceAudio() {
+            const word = words[currentWordIndex];
+            const utterance = new SpeechSynthesisUtterance(word.sen);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function playWordVoice(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function markStep(index) {
+            currentSteps[index] = !currentSteps[index];
+            updateUI();
+            
+            if (index === 2 && currentSteps[index]) {
+                playWordVoice(words[currentWordIndex].eng);
+            }
+            if (index === 3 && currentSteps[index]) playSentenceAudio();
+        }
+
+        function updateUI() {
+            const word = words[currentWordIndex];
+            document.getElementById('word-eng').innerText = word.eng;
+            document.getElementById('word-chi').innerText = word.chi;
+            document.getElementById('word-pos').innerText = word.pos;
+            document.getElementById('layer-info').innerText = `Layer ${word.layer}: ${word.topic}`;
+            document.getElementById('word-sentence').innerHTML = word.sen.replace(word.eng, `<span class="text-indigo-400 font-bold underline decoration-indigo-500/50">${word.eng}</span>`);
+            document.getElementById('word-translation').innerText = word.tra;
+
+            const badge = document.getElementById('confusing-badge');
+            const note = document.getElementById('comparison-note');
+            const mainCard = document.getElementById('main-card');
+
+            if (word.confusing) {
+                badge.classList.remove('hidden');
+                note.classList.remove('hidden');
+                document.getElementById('compare-word').innerText = word.compare;
+                document.getElementById('compare-text').innerText = word.note;
+                mainCard.classList.add('border-red-900/40');
+            } else {
+                badge.classList.add('hidden');
+                note.classList.add('hidden');
+                mainCard.classList.remove('border-red-900/40');
+            }
+
+            for (let i = 0; i < 5; i++) {
+                const btn = document.getElementById(`step-btn-${i}`);
+                if (currentSteps[i]) {
+                    btn.className = 'step-btn border-2 rounded-xl py-2 md:py-3 flex flex-col items-center transition-all step-done';
+                } else {
+                    btn.className = 'step-btn border-2 border-slate-800 bg-slate-900/50 rounded-xl py-2 md:py-3 flex flex-col items-center transition-all text-slate-600 hover:border-slate-700';
+                }
+            }
+        }
+
+        function nextWord() {
+            currentWordIndex = (currentWordIndex + 1) % words.length;
+            currentSteps = [false, false, false, false, false];
+            updateUI();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 快速複習邏輯
+        function startQuickReview() {
+            const reviewModal = document.getElementById('review-modal');
+            const reviewList = document.getElementById('review-list');
+            reviewModal.classList.remove('hidden');
+            
+            // 隨機選三個字
+            const shuffled = [...words].sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, 3);
+            
+            reviewList.innerHTML = '';
+            selected.forEach(word => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-800/50 p-4 rounded-2xl border border-slate-700 flex justify-between items-center group active:scale-95 transition-all';
+                item.innerHTML = `
+                    <div class="text-left">
+                        <p class="text-white font-bold text-lg">${word.eng}</p>
+                        <p class="text-slate-500 text-xs">${word.chi}</p>
+                    </div>
+                    <button class="bg-indigo-600/20 text-indigo-400 p-2 rounded-full border border-indigo-500/20" onclick="playWordVoice('${word.eng}')">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                `;
+                reviewList.appendChild(item);
+            });
+        }
+
+        function closeReview() {
+            document.getElementById('review-modal').classList.add('hidden');
+        }
+
+        let timeLeft = 25 * 60;
+        setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                const mins = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                document.getElementById('timer').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+        }, 1000);
+
+        updateUI();
+    </script>
+</body>
+</html>
